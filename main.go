@@ -11,6 +11,8 @@ import (
 	"google.golang.org/appengine/memcache"
 )
 
+const updateTime int = 20
+
 func returnJSON(w http.ResponseWriter, response []byte) {
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, string(response[:]))
@@ -34,7 +36,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 					memItem := &memcache.Item{
 						Key:        r.URL.Path,
 						Value:      response,
-						Expiration: time.Duration(30) * time.Second,
+						Expiration: time.Duration(updateTime) * time.Second,
 					}
 					memcache.Set(ctx, memItem)
 
@@ -51,7 +53,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 				memItem := &memcache.Item{
 					Key:        r.URL.Path,
 					Value:      response,
-					Expiration: time.Duration(30) * time.Second,
+					Expiration: time.Duration(updateTime) * time.Second,
 				}
 				memcache.Set(ctx, memItem)
 

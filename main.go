@@ -44,8 +44,22 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			return
-		default:
-			fmt.Fprintln(w, url[1])
+		case "service":
+			if cacheRes, err := memcache.Get(ctx, r.URL.Path); err == memcache.ErrCacheMiss {
+				response := getService(url[2], r)
+
+				memItem := &memcache.Item{
+					Key:        r.URL.Path,
+					Value:      response,
+					Expiration: time.Duration(30) * time.Second,
+				}
+				memcache.Set(ctx, memItem)
+
+				returnJSON(w, response)
+			} else {
+				returnJSON(w, cacheRes.Value)
+			}
+			return
 		}
 	}
 

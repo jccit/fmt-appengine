@@ -15,7 +15,7 @@ type ServiceDetail struct {
 	GeneratedAt        string         `xml:"generatedAt"`
 	Location           string         `xml:"locationName"`
 	CRS                string         `xml:"crs"`
-	Platform           bool           `xml:"platformAvailable"`
+	Platform           int            `xml:"platform"`
 	Operator           string         `xml:"operator"`
 	OperatorCode       string         `xml:"operatorCode"`
 	ServiceType        string         `xml:"serviceType"`

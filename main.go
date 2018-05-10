@@ -4,18 +4,21 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"google.golang.org/appengine"
+	"google.golang.org/appengine/memcache"
 )
 
-func returnJSON(w http.ResponseWriter, response string) {
+func returnJSON(w http.ResponseWriter, response []byte) {
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintln(w, response)
+	fmt.Fprintln(w, string(response[:]))
 }
 
 func requestHandler(w http.ResponseWriter, r *http.Request) {
 	url := strings.Split(r.URL.Path, "/")
+	ctx := appengine.NewContext(r)
 
 	// url[1] == method
 	// url[2] == param
@@ -26,8 +29,19 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, "bad input")
 				w.WriteHeader(http.StatusBadRequest)
 			} else {
-				response := getDepartures(strings.ToUpper(url[2]), r)
-				returnJSON(w, response)
+				if cacheRes, err := memcache.Get(ctx, r.URL.Path); err == memcache.ErrCacheMiss {
+					response := getDepartures(strings.ToUpper(url[2]), r)
+					memItem := &memcache.Item{
+						Key:        r.URL.Path,
+						Value:      response,
+						Expiration: time.Duration(30) * time.Second,
+					}
+					memcache.Set(ctx, memItem)
+
+					returnJSON(w, response)
+				} else {
+					returnJSON(w, cacheRes.Value)
+				}
 			}
 			return
 		default:

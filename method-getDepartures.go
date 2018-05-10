@@ -28,7 +28,7 @@ func getDeparturesRequestXML(filter string) string {
 	return strings.Replace(combined, "\n", "", -1)
 }
 
-func getDepartures(crs string, r *http.Request) string {
+func getDepartures(crs string, r *http.Request) []byte {
 	filter := crsSelector(crs)
 	soapReq := getDeparturesRequestXML(filter)
 	response := sendPOST(endpoint, soapReq, r)
@@ -37,5 +37,5 @@ func getDepartures(crs string, r *http.Request) string {
 	xml.Unmarshal(response, &parsedResponse)
 	converted, _ := json.Marshal(parsedResponse)
 
-	return string(converted[:])
+	return converted
 }

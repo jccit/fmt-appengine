@@ -41,7 +41,7 @@ func getHeader() string {
 	return out.String()
 }
 
-func sendPOST(url string, soapStr string, r *http.Request) string {
+func sendPOST(url string, soapStr string, r *http.Request) []byte {
 	ctx := appengine.NewContext(r)
 	client := urlfetch.Client(ctx)
 
@@ -50,11 +50,11 @@ func sendPOST(url string, soapStr string, r *http.Request) string {
 	resp, err := client.Post(url, "text/xml", bytes.NewBuffer(soapBody))
 
 	if err != nil {
-		return "error"
+		return nil
 	}
 
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	return string(body[:])
+	return body
 }

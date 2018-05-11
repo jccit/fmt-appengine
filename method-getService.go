@@ -47,8 +47,8 @@ func getService(id string, r *http.Request) []byte {
 
 	if strings.Contains(string(response[:]), "Invalid Service ID") {
 		return []byte("invalid id")
-	} else {
-		converted, _ := json.Marshal(parsedResponse)
-		return converted
 	}
+
+	converted, _ := json.Marshal(parsedResponse)
+	return converted
 }

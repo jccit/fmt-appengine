@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -19,20 +20,23 @@ func returnJSON(w http.ResponseWriter, response []byte) {
 }
 
 func requestHandler(w http.ResponseWriter, r *http.Request) {
-	url := strings.Split(r.URL.Path, "/")
+	reqPath := strings.Split(r.URL.Path, "/")
 	ctx := appengine.NewContext(r)
 
-	// url[1] == method
-	// url[2] == param
-	if len(url) > 0 {
-		switch url[1] {
+	method := reqPath[1]
+	param, _ := url.PathUnescape(reqPath[2])
+
+	// method == method
+	// param == param
+	if len(reqPath) > 0 {
+		switch method {
 		case "departures":
-			if utf8.RuneCountInString(url[2]) != 3 {
+			if utf8.RuneCountInString(param) != 3 {
 				fmt.Fprintln(w, "bad input")
 				w.WriteHeader(http.StatusBadRequest)
 			} else {
 				if cacheRes, err := memcache.Get(ctx, r.URL.Path); err == memcache.ErrCacheMiss {
-					response := getDepartures(strings.ToUpper(url[2]), r)
+					response := getDepartures(strings.ToUpper(param), r)
 					memItem := &memcache.Item{
 						Key:        r.URL.Path,
 						Value:      response,
@@ -48,7 +52,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		case "service":
 			if cacheRes, err := memcache.Get(ctx, r.URL.Path); err == memcache.ErrCacheMiss {
-				response := getService(url[2], r)
+				response := getService(param, r)
 
 				memItem := &memcache.Item{
 					Key:        r.URL.Path,

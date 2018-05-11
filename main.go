@@ -23,12 +23,12 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	reqPath := strings.Split(r.URL.Path, "/")
 	ctx := appengine.NewContext(r)
 
-	method := reqPath[1]
-	param, _ := url.PathUnescape(reqPath[2])
-
 	// method == method
 	// param == param
-	if len(reqPath) > 0 {
+	if len(reqPath) > 2 {
+		method := reqPath[1]
+		param, _ := url.PathUnescape(reqPath[2])
+
 		switch method {
 		case "departures":
 			if utf8.RuneCountInString(param) != 3 {

@@ -23,6 +23,18 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	reqPath := strings.Split(r.URL.Path, "/")
 	ctx := appengine.NewContext(r)
 
+	origin := r.Header.Get("Origin")
+
+	switch origin {
+	case "http://localhost:3000":
+		fallthrough
+	case "http://localhost:5000":
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+
+	default:
+		w.Header().Set("Access-Control-Allow-Origin", "https://findmytrain.app")
+	}
+
 	// method == method
 	// param == param
 	if len(reqPath) > 2 {

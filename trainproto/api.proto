@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package trainproto;
+
+option java_package = "app.findmytrain.fmtandroid.proto";
+option java_outer_classname = "FMTProtobuf";
+
+message Location {
+    // @inject_tag: xml:"crs"
+    string CRS = 1;
+    // @inject_tag: xml:"locationName"
+    string Name = 2;
+}
+
+message BoardService {
+    // @inject_tag: xml:"std"
+    string ScheduledDeparture = 1;
+    // @inject_tag: xml:"etd"
+    string EstimatedDeparture = 2;
+    // @inject_tag: xml:"sta"
+    string ScheduledArrival = 3;
+    // @inject_tag: xml:"eta"
+    string EstimatedArrival = 4;
+
+    // @inject_tag: xml:"platform"
+    int32 Platform = 5;
+
+    // @inject_tag: xml:"operator"
+    string Operator = 6;
+    // @inject_tag: xml:"operatorCode"
+    string OperatorCode = 7;
+
+    // @inject_tag: xml:"serviceType"
+    string ServiceType = 8;
+    // @inject_tag: xml:"serviceID"
+    string ServiceID = 9;
+
+    // @inject_tag: xml:"origin>location"
+    Location Origin = 10;
+    // @inject_tag: xml:"destination>location"
+    Location Destination = 11;
+}
+
+message DepartureBoard {
+    string GeneratedAt = 1;
+    string Location = 2;
+    string CRS = 3;
+    bool HasPlatform = 4;
+    repeated BoardService Services = 5;
+}

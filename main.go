@@ -56,7 +56,9 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 					}
 					memcache.Set(ctx, memItem)
 
-					returnJSON(w, response)
+					//returnJSON(w, response)
+					w.Header().Set("Content-Type", "application/octet-stream")
+					w.Write(response)
 				} else {
 					returnJSON(w, cacheRes.Value)
 				}

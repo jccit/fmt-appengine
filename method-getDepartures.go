@@ -1,8 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"encoding/xml"
+	"fmt-appengine/trainproto"
+	"github.com/golang/protobuf/proto"
 	"net/http"
 	"strings"
 )
@@ -14,11 +15,11 @@ type DepartureBoardResponse struct {
 }
 
 type DepartureBoard struct {
-	GeneratedAt string         `xml:"generatedAt"`
-	Location    string         `xml:"locationName"`
-	CRS         string         `xml:"crs"`
-	Platform    bool           `xml:"platformAvailable"`
-	Services    []BoardService `xml:"trainServices>service"`
+	GeneratedAt string                     `xml:"generatedAt"`
+	Location    string                     `xml:"locationName"`
+	CRS         string                     `xml:"crs"`
+	Platform    bool                       `xml:"platformAvailable"`
+	Services    []*trainproto.BoardService `xml:"trainServices>service"`
 }
 
 func getDeparturesRequestXML(filter string) string {
@@ -35,7 +36,17 @@ func getDepartures(crs string, r *http.Request) []byte {
 
 	var parsedResponse DepartureBoardResponse
 	xml.Unmarshal(response, &parsedResponse)
-	converted, _ := json.Marshal(parsedResponse)
+	// converted, _ := json.Marshal(parsedResponse)
 
-	return converted
+	protoResponse := &trainproto.DepartureBoard{
+		GeneratedAt: parsedResponse.Board.GeneratedAt,
+		Location:    parsedResponse.Board.Location,
+		CRS:         parsedResponse.Board.CRS,
+		HasPlatform: parsedResponse.Board.Platform,
+		Services:    parsedResponse.Board.Services,
+	}
+
+	out, _ := proto.Marshal(protoResponse)
+
+	return out
 }
